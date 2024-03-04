@@ -1,25 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import CountryDropdown from "./CountryDropdown";
+import StateDropdown from "./StateDropdown";
+import CityDropdown from "./CityDropdown";
 
-function App() {
+export default function App() {
+  const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedState, setSelectedState] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
+
+  // Fetch countries on initial render
+  useEffect(() => {
+    fetch("https://crio-location-selector.onrender.com/countries")
+      .then((response) => response.json())
+      .then((data) => setCountries(data))
+      .catch((error) => console.error("Error fetching countries:", error));
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <CountryDropdown
+        countries={countries}
+        selectedCountry={selectedCountry}
+        setSelectedCountry={setSelectedCountry}
+      />
+      {selectedCountry && (
+        <StateDropdown
+          country={selectedCountry}
+          selectedState={selectedState}
+          setSelectedState={setSelectedState}
+        />
+      )}
+      {selectedState && (
+        <CityDropdown
+          country={selectedCountry}
+          state={selectedState}
+          selectedCity={selectedCity}
+          setSelectedCity={setSelectedCity}
+        />
+      )}
+      {selectedCity && (
+        <div>
+          <p>{`You Selected ${selectedCity}, ${selectedState}, ${selectedCountry}`}</p>
+        </div>
+      )}
     </div>
   );
-}
-
-export default App;
+};
